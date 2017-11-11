@@ -14,7 +14,8 @@ Console::Console()
 
 void Console::startConsole()
 {
-    std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n";
+    std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n\
+           | dirinfo | createpath |    \n\n";
 
     for (int j = 0; j < width; j++)
         std::cout << "\u2593";
@@ -30,17 +31,65 @@ void Console::startConsole()
     }
 }
 
-void Console::controller()
+bool Console::errorhandling(COMMANDS command, const std::vector<std::string> &buff)
 {
 
-    /* SumOfCharacter's const */
-    enum { CREATEDIR = 947, REMOVEDIR = 973, CURRENTPATH = 1200, CHANGEDIR = 933, DIRLIST = 763, COPYDIR = 762, MOVEDIR = 758, CLEAR = 519, EXIT = 442 };
+    if (buff.empty())
+    {
+        std::cout << "Enter command." << std::endl;
+        return false;
+    }
 
-    // sum of char command for switch
+    // controll command
+    switch (command)
+    {
+        case CREATEDIR:
+        case CREATEPATH:
+        case REMOVEDIR:
+        case CHANGEDIR:
+            if (buff.size() != 2)
+            {
+                std::cout << "Invalid number of arguments." << std::endl;
+                return false;
+            }
+            else
+                return true;
+            break;
+
+        case COPYDIR:
+        case MOVEDIR:
+                if (buff.size() != 3)
+                {
+                    std::cout << "Invalid number of arguments." << std::endl;
+                    return false;
+                }
+                else
+                    return true;
+                break;
+
+        case DIRLIST:
+                if (buff.size() == 2)
+                    return true;
+                else
+                    return false;
+        case CURRENTPATH:
+        case DIRINFO:
+        case CLEAR:
+        case EXIT:
+                return true;
+                break;
+
+        default:
+            std::cout << "Error: Command not found.\n";
+            return false;
+    }
+
+    return true;
+}
+
+int Console::parser(std::vector<std::string> &buff)
+{
     int sumOfChar = 0;
-
-    // path (command + pathFrom + destinationPath)
-    std::vector<std::string> path;
     std::string text;
     std::string word;
 
@@ -50,65 +99,107 @@ void Console::controller()
     // path[0] = command path[1] = pathFrom path[2] = destinationPath
     while (ss >> word)
     {
-        path.push_back(word);
+        buff.push_back(word);
     }
 
-    // Subtract all caracter's of command
-    for ( int k = 0; path[0][k] != '\0'; sumOfChar += path[0][k], k++ );
+    // Subtract all caracter's of buff[0] - command
+    for ( int k = 0; buff[0][k] != '\0'; sumOfChar += buff[0][k], k++ );
 
-//    std::cout << sumOfChar << std::endl;
-
-    // controll command
-    switch (sumOfChar)
-    {
-        case CREATEDIR:
-            Dir::createDir(path);
-            break;
-
-        case REMOVEDIR:
-            Dir::removeDir(path);
-            break;
-
-        case CURRENTPATH:
-            Dir::currentPath();
-            break;
-
-        case CHANGEDIR:
-            Dir::changeDir(path);
-            break;
-
-        case DIRLIST:
-            Dir::dirList(path);
-            break;
-
-        case COPYDIR:
-            Dir::copyDir(path);
-            break;
-
-        case MOVEDIR:
-            Dir::moveDir(path);
-            break;
-
-        case CLEAR:
-            Console::clearScreen();
-            break;
-
-        case EXIT:
-            exit(1);
-            break;
-
-        default:
-            std::cout << "Error: Command not found.\n";
-    }
+    // return sumof characters command for switch
+    return sumOfChar;
 }
+
+void Console::controller()
+{
+
+    // path (command + pathFrom + destinationPath)
+    std::vector<std::string> buff;
+    std::string path;
+    std::string destPath;
+
+    // sum of char command for switch
+    COMMANDS command = COMMANDS(Console::parser(buff));
+
+    //std::cout << sumOfChar << std::endl;
+    bool flag = Console::errorhandling(command, buff);
+
+    if ((command == DIRLIST) && !flag)
+    {
+        path = ".";
+        Dir::dirList(path);
+    }
+
+    if(flag)
+    {
+       // controll command
+        switch (command)
+        {
+            case CREATEDIR:
+                path = buff[1];
+                Dir::createDir(path);
+                break;
+
+            case CREATEPATH:
+                path = buff[1];
+                Dir::createPath(path);
+                break;
+
+            case REMOVEDIR:
+                path = buff[1];
+                Dir::removeDir(path);
+                break;
+
+            case CURRENTPATH:
+                Dir::currentPath();
+                break;
+
+            case CHANGEDIR:
+                path = buff[1];
+                Dir::changeDir(path);
+                break;
+
+            case DIRLIST:
+                path = buff[1];
+                Dir::dirList(path);
+                break;
+
+            case COPYDIR:
+                path = buff[1];
+                destPath = buff[2];
+                Dir::copyDir(path, destPath);
+                break;
+
+            case MOVEDIR:
+                path = buff[1];
+                destPath = buff[2];
+                Dir::moveDir(path, destPath);
+                break;
+
+            case DIRINFO:
+                Dir::dirInfo(path);
+                break;
+
+            case CLEAR:
+                Console::clearScreen();
+                break;
+
+            case EXIT:
+                exit(1);
+                break;
+
+            default:
+                std::cout << "Error: Command not found.\n";
+        }
+    }
+ }
 
 void Console::clearScreen()
 {
     // clear screen
     std:: cout << "\033[2J\033[1;1H";
 
-    std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n";
-
+    std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n\
+           | dirinfo | createpath |    \n\n";
     for (int j = 0; j < width; j++)
         std::cout << "\u2593";
         std::cout << std::endl;

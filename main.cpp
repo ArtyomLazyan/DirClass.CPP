@@ -1,7 +1,7 @@
 #include <iostream>
 #include "console.h"
 
-int main(int argc, const char *argv[])
+int main()
 {
 
     Console c;

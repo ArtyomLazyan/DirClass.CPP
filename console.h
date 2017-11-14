@@ -21,6 +21,7 @@ private:
         MOVEDIR = 758,
         DIRINFO = 747,
         CREATEPATH = 1057,
+        RENAME = 632,
         CLEAR = 519,
         EXIT = 442
     };

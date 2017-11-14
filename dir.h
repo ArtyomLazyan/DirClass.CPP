@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <ftw.h>
 #include <vector>
@@ -40,6 +41,7 @@ public:
 
     static bool createPath(const std::string &path);
 
+    static bool renameDir(const std::string &path, const std::string &destPath);
 };
 
 #endif

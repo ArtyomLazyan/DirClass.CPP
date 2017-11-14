@@ -257,3 +257,17 @@ bool Dir::createPath(const std::string &fullPath)
 
     return true;
 }
+
+bool Dir::renameDir(const std::string &path, const std::string &destPath)
+{
+    if (!(rename(path.c_str(), destPath.c_str())))
+    {
+        std::cout << "Dir renamed." << std::endl;
+        return true;
+    }
+    else
+    {
+        perror("rename");
+        return false;
+    }
+}

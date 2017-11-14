@@ -7,7 +7,7 @@
 
 Console::Console()
 {
-    //consol size
+    /* consol size */
     width = 110;
     height = 200;
 }
@@ -15,7 +15,7 @@ Console::Console()
 void Console::startConsole()
 {
     std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n\
-           | dirinfo | createpath |    \n\n";
+           | dirinfo | createpath | rename |  \n\n";
 
     for (int j = 0; j < width; j++)
         std::cout << "\u2593";
@@ -58,6 +58,7 @@ bool Console::errorhandling(COMMANDS command, const std::vector<std::string> &bu
 
         case COPYDIR:
         case MOVEDIR:
+        case RENAME:
                 if (buff.size() != 3)
                 {
                     std::cout << "Invalid number of arguments." << std::endl;
@@ -120,9 +121,12 @@ void Console::controller()
     // sum of char command for switch
     COMMANDS command = COMMANDS(Console::parser(buff));
 
-    //std::cout << sumOfChar << std::endl;
+    //std::cout << command << std::endl;
+
     bool flag = Console::errorhandling(command, buff);
 
+    
+    // if DIrlist path not set then default path will be current
     if ((command == DIRLIST) && !flag)
     {
         path = ".";
@@ -179,6 +183,12 @@ void Console::controller()
                 Dir::dirInfo(path);
                 break;
 
+            case RENAME:
+                path = buff[1];
+                destPath = buff[2];
+                Dir::renameDir(path, destPath);
+                break;
+
             case CLEAR:
                 Console::clearScreen();
                 break;
@@ -199,7 +209,7 @@ void Console::clearScreen()
     std:: cout << "\033[2J\033[1;1H";
 
     std::cout << "\n Commands: | dirlist | createdir | removedir | currentpath | changedir | copydir | movedir | clear | exit \n\n\
-           | dirinfo | createpath |    \n\n";
+           | dirinfo | createpath | rename |   \n\n";
     for (int j = 0; j < width; j++)
         std::cout << "\u2593";
         std::cout << std::endl;
